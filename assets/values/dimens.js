@@ -1,0 +1,86 @@
+
+import {
+    Dimensions,
+    Platform,
+    NativeModules
+} from 'react-native';
+
+const { StatusBarManager } = NativeModules;
+
+import {constants} from './constants';
+
+export const isMobile = (Dimensions.get('window').width < constants.tab_min_size);
+
+let size = {
+    size_0_5: 0.5,
+    size_0: 0,
+    size_1: 1,
+    size_2: 2,
+    size_3: 3,
+    size_4: 4,
+    size_5: 5,
+    size_6: 6,
+    size_7: 7,
+    size_8: 8,
+    size_9: 9,
+    size_10: 10,
+    size_11: 11,
+    size_12: 12,
+    size_13: 13,
+    size_14: 14,
+    size_15: 15,
+    size_16: 16,
+    size_17: 17,
+    size_18: 18,
+    size_19: 19,
+    size_20: 20,
+    size_21: 21,
+    size_22: 22,
+    size_23: 23,
+    size_24: 24,
+    size_25: 25,
+    size_26: 26,
+    size_27: 27,
+    size_28: 28,
+    size_29: 29,
+    size_30: 30,
+    size_35: 35,
+    size_36: 36,
+    size_40: 40,
+    size_42: 42,
+    size_44: 44,
+    size_48: 48,
+    size_50: 50,
+    size_54: 54,
+    size_60: 60,
+    size_64: 64,
+    size_65: 65,
+    size_70: 70,
+    size_80: 80,
+    size_100: 100,
+    size_120:120,
+    size_150: 150,
+    size_160: 160,
+    size_200: 200,
+    size_300: 300,
+    size_400: 400,
+    size_450: 450,
+    size_compare: 600,
+    screen_width: Dimensions.get('window').width,
+    screen_height: Dimensions.get('window').height,
+    text_size_vv_small: isMobile ? 12 : 18,
+    text_size_v_small: isMobile ? 14 : 20,
+    text_size_small: isMobile ? 16 : 22,
+    text_size_v_medium: isMobile ? 18 : 24,
+    text_size_medium: isMobile ? 20 : 26,
+    text_size_v_large: isMobile ? 22 : 28,
+    text_size_large: isMobile ? 26 : 32,
+    text_size_x_large: isMobile ? 28 : 34,
+    text_size_xx_large: isMobile ? 36 : 42,
+    tab_height: isMobile ? 50 : 70,
+    toolbar_height: Platform.OS === 'ios' ? 44 : 54,
+    status_bar_height: Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT,
+};
+
+export default size;
+export const actual_height = size.screen_height - size.toolbar_height - size.status_bar_height;

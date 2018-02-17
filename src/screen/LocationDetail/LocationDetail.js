@@ -1,0 +1,209 @@
+import React, {Component} from 'react';
+import {
+    View,
+    Text,
+    FlatList,
+    Image,
+    Platform,
+    Switch,
+    TouchableOpacity,
+    TextInput, Alert, ActivityIndicator, SectionList, ScrollView, PermissionsAndroid
+} from 'react-native';
+import styles from './styles'
+import {Icons} from "react-native-fontawesome";
+import {bindActionCreators} from "redux";
+import * as searchLocationsDataActions from "../../api/locations/actions";
+import {connect} from "react-redux";
+import MessageView from "../../widget/MessageView";
+import {Navigation} from "react-native-navigation";
+import font from "../../../assets/values/font";
+import size from "../../../assets/values/dimens";
+import MapView, {Marker, Polyline} from 'react-native-maps';
+import color from "../../../assets/values/color";
+import {Utils} from "../../utils/Utils";
+
+
+const ASPECT_RATIO = size.screen_width / size.screen_height;
+const LATITUDE_DELTA = 0.1;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+class Locations extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [], showMapView: false,
+            mapRegion: null,
+            lastLat: null,
+            lastLong: null,
+        };
+
+    }
+
+    async requestLocationPermission() {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    'title': 'Find Store Demo',
+                    'message': 'App needed location for better results.'
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("permission granted");
+                this.getCurrentLocation();
+            } else {
+                console.log("permission denied");
+                this.requestLocationPermission();
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    }
+
+    onRegionChange(region, lastLat, lastLong) {
+        this.setState({
+            mapRegion: region,
+            lastLat: lastLat || this.state.lastLat,
+            lastLong: lastLong || this.state.lastLong
+        });
+        this.actionSetButton();
+    }
+
+    getCurrentLocation = () => {
+        this.watchID = navigator.geolocation.watchPosition((position) => {
+            let region = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA
+            };
+            this.onRegionChange(region, region.latitude, region.longitude);
+        });
+    };
+
+    componentWillUnmount() {
+        navigator.geolocation.clearWatch(this.watchID);
+    }
+
+    checkForLocationPermission() {
+        return new Promise((resolve, reject) => {
+            PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((permission) => {
+                resolve(permission);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+
+    }
+
+
+    actionSetButton = () => {
+        this.props.navigator.setButtons({
+            rightButtons: [
+                {
+                    id: 'action_toggle_menu',
+                    showAsAction: 'always',
+                    icon: this.state.showMapView ? require('./../../../assets/images/menu/ic_action_view_list.png')
+                        : require('./../../../assets/images/menu/ic_action_map.png')
+                }
+            ]
+        });
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    };
+
+
+    toggleShowState = () => {
+        this.setState({showMapView: !this.state.showMapView}, () => {
+            this.actionSetButton();
+        });
+    };
+
+    onNavigatorEvent = (event) => {
+        if (event.type === 'NavBarButtonPress') {
+            switch (event.id) {
+                case 'action_toggle_menu':
+                    this.toggleShowState && this.toggleShowState();
+                    break;
+            }
+        }
+    };
+
+
+    componentDidMount() {
+        this.requestLocationPermission();
+        this.searchLocations();
+    }
+
+    onPressItem = (item, index) => {
+
+    };
+
+    componentWillReceiveProps(nextProps) {
+        if (this.searchServiceCalling && !nextProps.searchLocationsData.isLoading) {
+            this.searchServiceCalling = false;
+            if (nextProps.searchLocationsData.status) {
+                this.setState({data: nextProps.searchLocationsData.data});
+            } else {
+                this.setState({data: []});
+                this.refs.messageView.showError(nextProps.searchLocationsData.message);
+            }
+        }
+    }
+
+    searchLocations = () => {
+        this.searchServiceCalling = true;
+        this.props.searchLocationsDataActions.getLocations({});
+    };
+
+    render() {
+        let {data, showMapView, mapRegion, lastLat, lastLong} = this.state;
+        return (
+            <View style={styles.container}>
+                {showMapView &&
+                <MapView
+                    showsUserLocation={true}
+                    style={styles.map_view}
+                    region={mapRegion}
+                >
+                    <Marker
+                        key={"my_marker"}
+                        title={"you are here"}
+                        coordinate={{
+                            latitude: parseFloat(lastLat),
+                            longitude: parseFloat(lastLong),
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA,
+                        }}
+                        pinColor={color.colorPrimary}
+                    />
+                    {this.getMarkersCoordinates()}
+                    {this.getPolylinesToLocations()}
+                </MapView>
+                ||
+                <LocationsList
+                    data={data}
+                    loading={this.searchServiceCalling && this.props.searchLocationsData.isLoading}
+                />
+                }
+                <MessageView
+                    ref='messageView'
+                />
+            </View>
+        );
+    };
+}
+
+function mapStateToProps(state) {
+    return {
+        searchLocationsData: state.locationsReducer,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        searchLocationsDataActions: bindActionCreators(searchLocationsDataActions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Locations);
