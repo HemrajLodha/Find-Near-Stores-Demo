@@ -19,7 +19,7 @@ import size from "../../../assets/values/dimens";
 import BaseFlatList from "../../base/BaseFlatList";
 import FontAwesome, {Icons} from 'react-native-fontawesome';
 
-export default class LocationsList extends Component {
+export default class LocationsList extends PureComponent {
 
     constructor(props) {
         super(props);
@@ -44,7 +44,6 @@ export default class LocationsList extends Component {
     renderItem = ({item, index}) => {
         return (
             <BaseItemView
-                key={`item${index}`}
                 onPressItem={this.onPressItem}
                 item={item}
                 index={index}>
@@ -69,8 +68,8 @@ export default class LocationsList extends Component {
     };
 
 
-    onPressItem = (id: string) => {
-
+    onPressItem = (item, index) => {
+        this.props.onPressItem && this.props.onPressItem(item, index);
     };
 
     componentWillReceiveProps(nextProps) {

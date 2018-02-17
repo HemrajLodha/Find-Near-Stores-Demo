@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import PropTypes from "prop-types";
 import {ActivityIndicator, FlatList, StyleSheet, View} from "react-native";
 import color from "../../assets/values/color";
@@ -14,7 +14,7 @@ const styles = StyleSheet.create(
     }
 );
 
-export default class BaseFlatList extends Component {
+export default class BaseFlatList extends PureComponent {
 
     constructor(props) {
         super(props);

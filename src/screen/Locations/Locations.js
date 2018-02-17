@@ -165,7 +165,11 @@ class Locations extends Component {
     }
 
     onPressItem = (item, index) => {
-
+        this.props.navigator.push({
+            screen: "findstoredemo.LocationDetail",
+            title: item.name,
+            passProps: {data: item}
+        })
     };
 
     componentWillReceiveProps(nextProps) {
@@ -214,6 +218,7 @@ class Locations extends Component {
                     style={showMapView && {flex: 0} || {flex: 1}}
                 >
                     <LocationsList
+                        onPressItem={this.onPressItem}
                         data={data}
                         loading={this.searchServiceCalling && this.props.searchLocationsData.isLoading}
                     />
