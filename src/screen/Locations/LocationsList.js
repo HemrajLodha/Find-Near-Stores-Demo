@@ -23,8 +23,7 @@ export default class LocationsList extends PureComponent {
 
     constructor(props) {
         super(props);
-        const data = [];
-        this.state = {data: data, loading: true};
+        this.state = {data: props.data || [], loading: props.loading || false, favouriteId: props.favouriteId || -1};
     }
 
     keyExtractor = (item, index) => item.id;
@@ -49,7 +48,8 @@ export default class LocationsList extends PureComponent {
                 index={index}>
                 <View style={styles.list_item_container}>
                     <View style={styles.list_item_title_cnt}>
-                        <FontAwesome style={styles.list_item_fav}>{Icons.starO}</FontAwesome>
+                        {item.id.toString() === this.state.favouriteId &&
+                        <FontAwesome style={styles.list_item_fav}>{Icons.star}</FontAwesome>}
                         <Text style={styles.list_item_title}>{item.name}</Text>
                     </View>
                     <Text style={styles.list_item_distance}>8 miles away</Text>
@@ -57,7 +57,7 @@ export default class LocationsList extends PureComponent {
                         <Text
                             numberOfLines={1}
                             style={styles.list_item_address}>{item.address}</Text>
-                        <FontAwesome style={styles.list_item_angle_r}>{Icons.angleDoubleRight}</FontAwesome>
+                        <FontAwesome style={styles.list_item_angle_r}>{Icons.angleRight}</FontAwesome>
                     </View>
                     <View style={styles.list_item_tag_cnt}>
                         {this.getTagViews(item.store_tags.split(","))}
@@ -74,6 +74,7 @@ export default class LocationsList extends PureComponent {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
+            favouriteId: nextProps.favouriteId,
             data: nextProps.data,
             loading: nextProps.loading
         });

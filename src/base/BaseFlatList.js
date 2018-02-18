@@ -61,7 +61,7 @@ export default class BaseFlatList extends PureComponent {
     }
 
     render() {
-        let {keyExtractor, style} = this.props;
+        let {keyExtractor, style, divider = true} = this.props;
         let {data} = this.state;
         return (
             <FlatList
@@ -70,8 +70,9 @@ export default class BaseFlatList extends PureComponent {
                 keyExtractor={keyExtractor}
                 renderItem={this.props.renderItem}
                 style={style}
+                horizontal={this.props.horizontal || false}
                 ListFooterComponent={this.props.loadingFooter || this.loadingFooter}
-                ItemSeparatorComponent={this.separatorComponent}
+                ItemSeparatorComponent={divider && this.separatorComponent}
             />
         );
     }

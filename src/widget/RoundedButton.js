@@ -31,22 +31,20 @@ export default class RoundedButton extends Component {
 
 const styles = StyleSheet.create({
     buttonCircle: {
-        width: dimens.screen_width * 0.6,
-        height: dimens.size_54,
-        borderRadius: Platform.OS==='ios'?dimens.size_54/2:dimens.size_54,
+        flex: 1,
+        width: dimens.screen_width * 0.4,
+        height: dimens.size_40,
+        borderRadius: dimens.size_20,
         backgroundColor: color.colorPrimary,
         alignSelf: 'center',
-        justifyContent:'center'
+        justifyContent: 'center'
     },
     button_text: {
-       // height: dimens.size_54,
-        //textAlignVertical: 'center',
         textAlign: 'center',
         color: '#FFFFFF',
         fontFamily: font.LatoRegular,
-        fontSize: dimens.text_size_medium,
-        justifyContent:'center',
-        marginHorizontal:dimens.size_5,
-        ///backgroundColor:'red',
+        fontSize: dimens.text_size_v_small,
+        justifyContent: 'center',
+        marginHorizontal: dimens.size_5,
     }
 });

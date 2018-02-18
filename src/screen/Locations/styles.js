@@ -27,8 +27,9 @@ const styles = StyleSheet.create(
             flexDirection: "row",
         },
         list_item_fav: {
-            fontSize: size.text_size_v_medium,
-            marginRight: size.size_8
+            fontSize: size.text_size_medium,
+            marginRight: size.size_8,
+            marginTop: size.size_4
         },
         list_item_title: {
             fontFamily: font.LatoHeavy,

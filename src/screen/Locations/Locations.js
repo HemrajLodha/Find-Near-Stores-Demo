@@ -22,6 +22,7 @@ import size from "../../../assets/values/dimens";
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
+import AsyncStorageKeys from "../../AsyncStorageKeys";
 
 
 const ASPECT_RATIO = size.screen_width / size.screen_height;
@@ -37,9 +38,34 @@ class Locations extends Component {
             mapRegion: null,
             lastLat: null,
             lastLong: null,
+            favouriteLocId: null,
         };
-
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
+
+
+    onNavigatorEvent = (event) => {
+        switch (event.id) {
+            case 'action_toggle_menu':
+                this.toggleShowState();
+                break;
+            case 'willAppear':
+                AsyncStorageKeys.getFavouriteItemId().then(Id => {
+                    this.setState({favouriteLocId: Id});
+                });
+                break;
+            case 'didAppear':
+
+                break;
+            case 'willDisappear':
+
+                break;
+            case 'didDisappear':
+                break;
+            case 'willCommitPreview':
+                break;
+        }
+    };
 
     async requestLocationPermission() {
         try {
@@ -106,16 +132,6 @@ class Locations extends Component {
         this.setState({showMapView: !this.state.showMapView}, () => {
             this.actionSetButton();
         });
-    };
-
-    onNavigatorEvent = (event) => {
-        if (event.type === 'NavBarButtonPress') {
-            switch (event.id) {
-                case 'action_toggle_menu':
-                    this.toggleShowState && this.toggleShowState();
-                    break;
-            }
-        }
     };
 
     getMarkersCoordinates = () => {
@@ -190,7 +206,7 @@ class Locations extends Component {
     };
 
     render() {
-        let {data, showMapView, mapRegion, lastLat, lastLong} = this.state;
+        let {data, showMapView, mapRegion, lastLat, lastLong, favouriteLocId} = this.state;
         return (
             <View style={styles.container}>
                 {showMapView &&
@@ -218,6 +234,7 @@ class Locations extends Component {
                     style={showMapView && {flex: 0} || {flex: 1}}
                 >
                     <LocationsList
+                        favouriteId={favouriteLocId}
                         onPressItem={this.onPressItem}
                         data={data}
                         loading={this.searchServiceCalling && this.props.searchLocationsData.isLoading}
