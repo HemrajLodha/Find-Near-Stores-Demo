@@ -10,6 +10,7 @@ import {
 import size from "../../assets/values/dimens";
 import font from "../../assets/values/font";
 import color from "../../assets/values/color";
+import {MessageType} from "./ResponseView";
 
 
 export default class MessageView extends Component {
@@ -22,6 +23,10 @@ export default class MessageView extends Component {
     async showMessage(message) {
         await this.setStateAsync({error: false});
         this.animateView(message);
+    };
+
+    async hideMessageView() {
+        this.slide(false);
     };
 
     async animateView(message) {
@@ -38,6 +43,14 @@ export default class MessageView extends Component {
         })
     }
 
+    static propTypes = {
+        autoHide: PropTypes.bool.isRequired
+    };
+
+
+    static defaultProps = {
+        autoHide: true
+    };
 
     constructor(props) {
         super(props);
@@ -63,11 +76,13 @@ export default class MessageView extends Component {
             }
         });
 
-        setTimeout(function () {
-            if (show) {
-                self.slide(false);
-            }
-        }, 5000);
+        if (this.props.autoHide) {
+            setTimeout(function () {
+                if (show) {
+                    self.slide(false);
+                }
+            }, 5000);
+        }
     };
 
     render() {

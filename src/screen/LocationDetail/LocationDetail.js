@@ -189,6 +189,7 @@ class LocationDetail extends Component {
                 </View>
                 <MessageView
                     ref='messageView'
+                    autoHide={true}
                 />
             </View>
         );

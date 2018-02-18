@@ -15,9 +15,6 @@ import {bindActionCreators} from "redux";
 import * as searchRoutesDataActions from "../../api/routes/actions";
 import {connect} from "react-redux";
 import MessageView from "../../widget/MessageView";
-import LocationsList from "./LocationsList";
-import {Navigation} from "react-native-navigation";
-import font from "../../../assets/values/font";
 import size from "../../../assets/values/dimens";
 import MapView from 'react-native-maps';
 import color from "../../../assets/values/color";
@@ -202,7 +199,7 @@ class Locations extends Component {
                 coordinates={this.state.coords}
                 lineCap={"round"}
                 lineJoin={"round"}
-                strokeColor={Utils.getRandomColor()}
+                strokeColor={"#5F02D0"}
                 strokeColors={[
                     '#238C23',
                     '#7F0000'
@@ -256,7 +253,7 @@ class Locations extends Component {
     };
 
     render() {
-        let {mapRegion, lastLat, lastLong,data} = this.state;
+        let {mapRegion, lastLat, lastLong, data} = this.state;
         return (
             <View style={styles.container}>
                 {
@@ -296,6 +293,7 @@ class Locations extends Component {
                 </View>
                 <MessageView
                     ref='messageView'
+                    autoHide={true}
                 />
             </View>
         );

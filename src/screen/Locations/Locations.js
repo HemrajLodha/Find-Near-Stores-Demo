@@ -19,7 +19,7 @@ import LocationsList from "./LocationsList";
 import {Navigation} from "react-native-navigation";
 import font from "../../../assets/values/font";
 import size from "../../../assets/values/dimens";
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, {AnimatedRegion, Marker, Polyline} from 'react-native-maps';
 import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
 import AsyncStorageKeys from "../../AsyncStorageKeys";
@@ -28,13 +28,16 @@ import AsyncStorageKeys from "../../AsyncStorageKeys";
 const ASPECT_RATIO = size.screen_width / size.screen_height;
 const LATITUDE_DELTA = 0.1;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const SPACE = 0.01;
+const DEFAULT_PADDING = {top: size.size_20, right: size.size_20, bottom: size.size_20, left: size.size_20};
 
 class Locations extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            data: [], showMapView: false,
+            data: [],
+            showMapView: false,
             mapRegion: null,
             lastLat: null,
             lastLong: null,
@@ -97,6 +100,7 @@ class Locations extends Component {
         });
         AsyncStorageKeys.setCurrentLocation(JSON.stringify(region)).then(() => {
             this.actionSetButton();
+            this.refs.messageView.hideMessageView();
         }).catch(err => console.log("err", err));
     }
 
@@ -138,6 +142,11 @@ class Locations extends Component {
         });
     };
 
+
+    onMapReady = () => {
+
+    };
+
     getMarkersCoordinates = () => {
         return this.state.data.map((item, index) => {
             return (
@@ -153,11 +162,12 @@ class Locations extends Component {
                     }}
                     pinColor={color.gray_900}
                 />
-            )
+            );
         });
     };
 
     getPolylinesToLocations = () => {
+
         return this.state.data.map((item, index) => {
             return (
                 <Polyline
@@ -166,8 +176,7 @@ class Locations extends Component {
                         {latitude: parseFloat(this.state.lastLat), longitude: parseFloat(this.state.lastLong)},
                         {latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude)},
                     ]}
-                    lineCap={"round"}
-                    lineJoin={"round"}
+                    geodesic={true}
                     strokeColor={Utils.getRandomColor()}
                     strokeColors={[
                         '#238C23',
@@ -180,9 +189,14 @@ class Locations extends Component {
     };
 
     componentDidMount() {
-        this.requestLocationPermission();
+        if (Platform.OS === "android") {
+            this.requestLocationPermission();
+        } else {
+            this.getCurrentLocation();
+        }
         this.searchLocations();
     }
+
 
     onPressItem = (item, index) => {
         this.props.navigator.push({
@@ -215,6 +229,10 @@ class Locations extends Component {
             <View style={styles.container}>
                 {showMapView &&
                 <MapView
+                    ref={map => {
+                        this.map = map
+                    }}
+                    onMapReady={this.onMapReady}
                     showsUserLocation={true}
                     style={styles.map_view}
                     region={mapRegion}
@@ -246,6 +264,7 @@ class Locations extends Component {
                     />
                 </View>
                 <MessageView
+                    autoHide={false}
                     ref='messageView'
                 />
             </View>

@@ -19,7 +19,7 @@ Navigation.startSingleScreenApp(
     {
         screen: {
             screen: 'findstoredemo.Locations',
-            title: 'Locations',
+            title: 'Find Stores Demo',
             navigatorButtons: AppStyle,
             interactivePopGestureEnabled: true,
         },
