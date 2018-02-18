@@ -25,7 +25,10 @@ class LocationDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {data: props.data};
+        this.checkForFavourite();
+    }
 
+    checkForFavourite = () => {
         AsyncStorageKeys.getFavouriteItemId().then(id => {
             if (id === this.state.data.id.toString()) {
                 this.isFavourite = true;
@@ -36,9 +39,30 @@ class LocationDetail extends Component {
         }).catch(err => {
             this.isFavourite = false;
             this.actionSetButton();
-        })
+        });
+    };
 
-    }
+    onNavigatorEvent = (event) => {
+        switch (event.id) {
+            case 'action_toggle_menu':
+                this.toggleShowState();
+                break;
+            case 'willAppear':
+                this.checkForFavourite();
+                break;
+            case 'didAppear':
+
+                break;
+            case 'willDisappear':
+
+                break;
+            case 'didDisappear':
+
+                break;
+            case 'willCommitPreview':
+                break;
+        }
+    };
 
     actionSetButton = () => {
         this.props.navigator.setButtons({
@@ -67,17 +91,6 @@ class LocationDetail extends Component {
             });
         }
     };
-
-    onNavigatorEvent = (event) => {
-        if (event.type === 'NavBarButtonPress') {
-            switch (event.id) {
-                case 'action_toggle_menu':
-                    this.toggleShowState();
-                    break;
-            }
-        }
-    };
-
 
     getTagViews = (tags) => {
         return tags.map((item, index) => {
@@ -115,18 +128,26 @@ class LocationDetail extends Component {
         return openNow;
     };
 
+    getDirection = () => {
+        this.props.navigator.push({
+            screen: "findstoredemo.StoreDirection",
+            title: this.state.data.name,
+            passProps: {data: this.state.data}
+        })
+    };
+
     render() {
         let {data} = this.state;
         let openNow = this.getCurrentStoreOpenStatus(data.store_times);
         return (
             <View style={styles.container}>
-                <ScrollView>
+                <ScrollView style={{marginBottom: size.size_65}}>
                     <View style={{flex: 1}}>
                         <View style={styles.list_item_container}>
                             <View style={styles.list_item_title_cnt}>
                                 <Text style={styles.list_item_title}>{data.name}</Text>
                             </View>
-                            <Text style={styles.list_item_distance}>8 miles away</Text>
+                            <Text style={styles.list_item_distance}>Not Available</Text>
                             <View style={styles.list_item_title_cnt}>
                                 <Text
                                     style={styles.list_item_address}>{data.address}</Text>
@@ -136,7 +157,7 @@ class LocationDetail extends Component {
                             </View>
                         </View>
                         <View
-                            style={[styles.list_item_store_hour_cnt, {marginTop: size.size_16}]}>
+                            style={[styles.list_item_store_hour_cnt]}>
                             <Text style={styles.store_hour_title}>Store Hours</Text>
                             <Text style={styles.store_hour_open_status}>{openNow && "Open Now" || "Closed Now"}</Text>
                             <TimeList
@@ -147,22 +168,25 @@ class LocationDetail extends Component {
                             <Text>
                                 <FontAwesome style={styles.review_quote_icon}>{Icons.quoteLeft}</FontAwesome>
                                 <Text style={styles.review_quote}>This store have amazing products. and employee
-                                    behaviour is also very good.</Text>
+                                    behaviour is also very good.
+                                </Text>
                                 <FontAwesome style={styles.review_quote_icon}>{Icons.quoteRight}</FontAwesome>
                             </Text>
                             <Text style={styles.review_author}>--Rodger Klemin</Text>
                         </View>
-                        <View
-                            style={styles.direction_button}>
-                            <TouchableOpacity style={{flex: 1}}>
-                                <RoundedButton text={"Call"}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{flex: 1}}>
-                                <RoundedButton text={"Get Direction"}/>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </ScrollView>
+                <View
+                    style={styles.direction_button}>
+                    <TouchableOpacity style={{flex: 1}}>
+                        <RoundedButton text={"Call"}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={this.getDirection}
+                        style={{flex: 1}}>
+                        <RoundedButton text={"Get Direction"}/>
+                    </TouchableOpacity>
+                </View>
                 <MessageView
                     ref='messageView'
                 />

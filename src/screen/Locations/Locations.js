@@ -61,11 +61,13 @@ class Locations extends Component {
 
                 break;
             case 'didDisappear':
+
                 break;
             case 'willCommitPreview':
                 break;
         }
     };
+
 
     async requestLocationPermission() {
         try {
@@ -77,14 +79,13 @@ class Locations extends Component {
                 }
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("permission granted");
                 this.getCurrentLocation();
             } else {
                 console.log("permission denied");
                 this.requestLocationPermission();
             }
         } catch (err) {
-            console.warn(err);
+            console.warn(err)
         }
     }
 
@@ -94,10 +95,13 @@ class Locations extends Component {
             lastLat: lastLat || this.state.lastLat,
             lastLong: lastLong || this.state.lastLong
         });
-        this.actionSetButton();
+        AsyncStorageKeys.setCurrentLocation(JSON.stringify(region)).then(() => {
+            this.actionSetButton();
+        }).catch(err => console.log("err", err));
     }
 
     getCurrentLocation = () => {
+        this.refs.messageView.showMessage("Fetching current location...");
         this.watchID = navigator.geolocation.watchPosition((position) => {
             let region = {
                 latitude: position.coords.latitude,
@@ -214,6 +218,7 @@ class Locations extends Component {
                     showsUserLocation={true}
                     style={styles.map_view}
                     region={mapRegion}
+                    showsPointsOfInterest={true}
                 >
                     <Marker
                         key={"my_marker"}
