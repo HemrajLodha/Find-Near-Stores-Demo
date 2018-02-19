@@ -18,15 +18,30 @@ import size from "../../../assets/values/dimens";
 import TimeList from "./TimeList";
 import {Utils} from "../../utils/Utils";
 import RoundedButton from "../../widget/RoundedButton";
+import color from "../../../assets/values/color";
+import MapView from "react-native-maps";
 
 
 class LocationDetail extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {data: props.data};
+        this.state = {data: props.data, distance: 0, mapRegion: null};
         this.checkForFavourite();
+        this.getDistance();
     }
+
+    getDistance = () => {
+        AsyncStorageKeys.getCurrentLocation().then(location => {
+            let distance = Utils.getDistance(location.latitude, location.longitude, this.state.data.latitude, this.state.data.longitude, "K");
+            distance = distance / 1000;
+            distance = parseFloat(distance).toFixed(1);
+            this.setState({
+                mapRegion: location,
+                distance: distance
+            });
+        });
+    };
 
     checkForFavourite = () => {
         AsyncStorageKeys.getFavouriteItemId().then(id => {
@@ -137,17 +152,28 @@ class LocationDetail extends Component {
     };
 
     render() {
-        let {data} = this.state;
+        let {data, distance, mapRegion} = this.state;
         let openNow = this.getCurrentStoreOpenStatus(data.store_times);
+
         return (
             <View style={styles.container}>
                 <ScrollView style={{marginBottom: size.size_65}}>
                     <View style={{flex: 1}}>
+                        {mapRegion &&
+                        <MapView
+                            style={{height: size.screen_height * 0.25}}
+                            liteMode={true}
+                            region={mapRegion}>
+                            <MapView.Marker
+                                coordinate={mapRegion}
+                            />
+                        </MapView>}
+
                         <View style={styles.list_item_container}>
                             <View style={styles.list_item_title_cnt}>
                                 <Text style={styles.list_item_title}>{data.name}</Text>
                             </View>
-                            <Text style={styles.list_item_distance}>Not Available</Text>
+                            <Text style={styles.list_item_distance}>{distance} km away</Text>
                             <View style={styles.list_item_title_cnt}>
                                 <Text
                                     style={styles.list_item_address}>{data.address}</Text>

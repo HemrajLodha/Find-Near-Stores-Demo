@@ -24,13 +24,12 @@ import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
 import AsyncStorageKeys from "../../AsyncStorageKeys";
 import {PermissionUtils} from "../../utils/PermissionUtils";
+import MapViewList from "./MapViewList";
 
 
 const ASPECT_RATIO = size.screen_width / size.screen_height;
 const LATITUDE_DELTA = 0.1;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const SPACE = 0.01;
-const DEFAULT_PADDING = {top: size.size_20, right: size.size_20, bottom: size.size_20, left: size.size_20};
 
 class Locations extends Component {
 
@@ -95,24 +94,7 @@ class Locations extends Component {
         } else {
             this.checkForLocationPermission();
         }
-        /*try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                {
-                    'title': 'Find Store Demo',
-                    'message': 'App needed location for better results.'
-                }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                this.getCurrentLocation();
-            } else {
-                console.log("permission denied");
-                this.requestLocationPermission();
-            }
-        } catch (err) {
-            console.warn(err)
-        }*/
-    }
+    };
 
     onRegionChange(region, lastLat, lastLong) {
         this.setState({
@@ -164,52 +146,6 @@ class Locations extends Component {
         });
     };
 
-
-    onMapReady = () => {
-
-    };
-
-    getMarkersCoordinates = () => {
-        return this.state.data.map((item, index) => {
-            return (
-                <Marker
-                    key={`marker${index}`}
-                    title={item.name}
-                    description={item.brand}
-                    coordinate={{
-                        latitude: parseFloat(item.latitude),
-                        longitude: parseFloat(item.longitude),
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
-                    }}
-                    pinColor={color.gray_900}
-                />
-            );
-        });
-    };
-
-    getPolylinesToLocations = () => {
-
-        return this.state.data.map((item, index) => {
-            return (
-                <Polyline
-                    key={`poliline${index}`}
-                    coordinates={[
-                        {latitude: parseFloat(this.state.lastLat), longitude: parseFloat(this.state.lastLong)},
-                        {latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude)},
-                    ]}
-                    geodesic={true}
-                    strokeColor={Utils.getRandomColor()}
-                    strokeColors={[
-                        '#238C23',
-                        '#7F0000'
-                    ]}
-                    strokeWidth={2}
-                />
-            )
-        });
-    };
-
     componentDidMount() {
         if (Platform.OS === "android") {
             this.requestLocationPermission();
@@ -250,39 +186,26 @@ class Locations extends Component {
         return (
             <View style={styles.container}>
                 {showMapView &&
-                <MapView
-                    ref={map => {
-                        this.map = map
-                    }}
-                    onMapReady={this.onMapReady}
-                    showsUserLocation={true}
-                    style={styles.map_view}
+                <MapViewList
                     region={mapRegion}
-                    showsPointsOfInterest={true}
-                >
-                    <Marker
-                        key={"my_marker"}
-                        title={"you are here"}
-                        coordinate={{
-                            latitude: parseFloat(lastLat),
-                            longitude: parseFloat(lastLong),
-                            latitudeDelta: LATITUDE_DELTA,
-                            longitudeDelta: LONGITUDE_DELTA,
-                        }}
-                        pinColor={color.colorPrimary}
-                    />
-                    {this.getMarkersCoordinates()}
-                    {this.getPolylinesToLocations()}
-                </MapView>
+                    lastLat={lastLat}
+                    lastLong={lastLong}
+                    data={data}
+                    style={styles.map_view}
+                    pinColor={color.colorPrimary}
+                    loading={this.props.searchLocationsData.isLoading}
+                />
                 }
                 <View
                     style={showMapView && {flex: 0} || {flex: 1}}
                 >
                     <LocationsList
+                        lastLat={lastLat || 0}
+                        lastLong={lastLat || 0}
                         favouriteId={favouriteLocId}
                         onPressItem={this.onPressItem}
-                        data={data}
-                        loading={this.searchServiceCalling && this.props.searchLocationsData.isLoading}
+                        data={data || []}
+                        loading={this.searchServiceCalling && this.props.searchLocationsData.isLoading || false}
                     />
                 </View>
                 <MessageView

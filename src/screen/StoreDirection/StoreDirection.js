@@ -16,7 +16,7 @@ import * as searchRoutesDataActions from "../../api/routes/actions";
 import {connect} from "react-redux";
 import MessageView from "../../widget/MessageView";
 import size from "../../../assets/values/dimens";
-import MapView from 'react-native-maps';
+import MapView, {AnimatedRegion} from 'react-native-maps';
 import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
 import AsyncStorageKeys from "../../AsyncStorageKeys";
@@ -37,7 +37,8 @@ class Locations extends Component {
             mapRegion: null,
             lastLat: null,
             lastLong: null,
-            coords: []
+            coords: [],
+            distance: 0
         };
 
         AsyncStorageKeys.getFavouriteItemId().then(id => {
@@ -50,8 +51,18 @@ class Locations extends Component {
         }).catch(err => {
             this.isFavourite = false;
             this.actionSetButton();
-        })
+        });
+        this.getDistance();
     }
+
+    getDistance = () => {
+        AsyncStorageKeys.getCurrentLocation().then(location => {
+            let distance = Utils.getDistance(location.latitude, location.longitude, this.state.data.latitude, this.state.data.longitude, "K");
+            distance = distance / 1000;
+            distance = parseFloat(distance).toFixed(1);
+            this.setState({distance: distance});
+        });
+    };
 
     actionSetButton = () => {
         this.props.navigator.setButtons({
@@ -100,8 +111,8 @@ class Locations extends Component {
         }
     };
 
-    requestLocationPermission() {
-       /* PermissionUtils._checkLocationPermission().then(() => {
+    checkForLocationPermission = () => {
+        PermissionUtils._checkLocationPermission().then(() => {
             this.getCurrentLocation();
         }).catch(err => {
             PermissionUtils._requestLocationPermission().then(() => {
@@ -109,26 +120,18 @@ class Locations extends Component {
             }).catch(err => {
                 this.requestLocationPermission();
             });
-        });*/
+        });
+    };
 
-        try {
-            PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                {
-                    'title': 'Find Store Demo',
-                    'message': 'App needed location for better results.'
-                }
-            ).then(granted => {
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("permission granted");
-                    this.getCurrentLocation();
-                } else {
-                    console.log("permission denied");
-                    this.requestLocationPermission();
-                }
-            })
-        } catch (err) {
-            console.warn(err);
+    requestLocationPermission() {
+        if (Platform.OS === "android") {
+            if (Platform.Version > 22) {
+                this.checkForLocationPermission();
+            } else {
+                this.getCurrentLocation();
+            }
+        } else {
+            this.checkForLocationPermission();
         }
     }
 
@@ -142,7 +145,6 @@ class Locations extends Component {
             origin: region.latitude.toString() + "," + region.longitude.toString(),
             destination: this.state.data.latitude.toString() + "," + this.state.data.longitude.toString()
         };
-        console.log("data", data);
         this.searchServiceCalling = true;
         this.refs.messageView.showMessage("Fetching routes....");
         this.props.searchRoutesDataActions.getRoutes(data);
@@ -206,10 +208,11 @@ class Locations extends Component {
     getPolylinesToLocations = () => {
         return (
             <MapView.Polyline
+                ref={polyline => {
+                    this.polyline = polyline;
+                }}
                 key={'route_line'}
                 coordinates={this.state.coords}
-                lineCap={"round"}
-                lineJoin={"round"}
                 strokeColor={"#5F02D0"}
                 strokeColors={[
                     '#238C23',
@@ -264,7 +267,7 @@ class Locations extends Component {
     };
 
     render() {
-        let {mapRegion, lastLat, lastLong, data} = this.state;
+        let {mapRegion, lastLat, lastLong, data, distance} = this.state;
         return (
             <View style={styles.container}>
                 {
@@ -293,7 +296,7 @@ class Locations extends Component {
                     <View style={styles.list_item_title_cnt}>
                         <Text style={styles.list_item_title}>{data.name}</Text>
                     </View>
-                    <Text style={styles.list_item_distance}>Not Available</Text>
+                    <Text style={styles.list_item_distance}>{distance} km away</Text>
                     <View style={styles.list_item_title_cnt}>
                         <Text
                             style={styles.list_item_address}>{data.address}</Text>
