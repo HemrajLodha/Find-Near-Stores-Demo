@@ -201,7 +201,7 @@ class Locations extends Component {
                 >
                     <LocationsList
                         lastLat={lastLat || 0}
-                        lastLong={lastLat || 0}
+                        lastLong={lastLong || 0}
                         favouriteId={favouriteLocId}
                         onPressItem={this.onPressItem}
                         data={data || []}

@@ -3618,6 +3618,10 @@ react-native-permissions@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-1.1.1.tgz#4876004681ff8556454613d85249b01baff9b35b"
 
+react-native-send-intent@^1.0.23:
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/react-native-send-intent/-/react-native-send-intent-1.0.23.tgz#28d5cab978ffde970536a208dd6f960852084c8b"
+
 react-native@^0.50.4:
   version "0.50.4"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.50.4.tgz#194f5da4939087b3acee712a503475f4942dca7e"

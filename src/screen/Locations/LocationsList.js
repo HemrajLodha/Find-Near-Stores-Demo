@@ -54,7 +54,6 @@ export default class LocationsList extends PureComponent {
         let distance = 0;
         if (this.props.lastLat && this.props.lastLong) {
             distance = Utils.getDistance(this.props.lastLat, this.props.lastLong, item.latitude, item.longitude, "K");
-            distance = distance / 1000;
             distance = parseFloat(distance).toFixed(1);
         }
         return (

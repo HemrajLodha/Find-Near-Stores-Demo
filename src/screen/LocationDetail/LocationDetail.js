@@ -34,7 +34,6 @@ class LocationDetail extends Component {
     getDistance = () => {
         AsyncStorageKeys.getCurrentLocation().then(location => {
             let distance = Utils.getDistance(location.latitude, location.longitude, this.state.data.latitude, this.state.data.longitude, "K");
-            distance = distance / 1000;
             distance = parseFloat(distance).toFixed(1);
             this.setState({
                 mapRegion: location,
@@ -143,6 +142,12 @@ class LocationDetail extends Component {
         return openNow;
     };
 
+    actionCall = () => {
+        if (Platform.OS === "android") {
+
+        }
+    };
+
     getDirection = () => {
         this.props.navigator.push({
             screen: "findstoredemo.StoreDirection",
@@ -204,7 +209,9 @@ class LocationDetail extends Component {
                 </ScrollView>
                 <View
                     style={styles.direction_button}>
-                    <TouchableOpacity style={{flex: 1}}>
+                    <TouchableOpacity
+                        onPress={this.actionCall}
+                        style={{flex: 1}}>
                         <RoundedButton text={"Call"}/>
                     </TouchableOpacity>
                     <TouchableOpacity

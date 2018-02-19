@@ -58,7 +58,6 @@ class Locations extends Component {
     getDistance = () => {
         AsyncStorageKeys.getCurrentLocation().then(location => {
             let distance = Utils.getDistance(location.latitude, location.longitude, this.state.data.latitude, this.state.data.longitude, "K");
-            distance = distance / 1000;
             distance = parseFloat(distance).toFixed(1);
             this.setState({distance: distance});
         });
