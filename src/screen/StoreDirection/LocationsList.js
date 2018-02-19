@@ -12,10 +12,7 @@ import {
 
 
 import BaseItemView from "../../base/BaseItemView";
-import ProgressImageView from "../../widget/ProgressImageView";
 import styles from './styles'
-import color from "../../../assets/values/color";
-import size from "../../../assets/values/dimens";
 import BaseFlatList from "../../base/BaseFlatList";
 import FontAwesome, {Icons} from 'react-native-fontawesome';
 

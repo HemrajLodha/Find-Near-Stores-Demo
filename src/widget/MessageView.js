@@ -10,7 +10,6 @@ import {
 import size from "../../assets/values/dimens";
 import font from "../../assets/values/font";
 import color from "../../assets/values/color";
-import {MessageType} from "./ResponseView";
 
 
 export default class MessageView extends Component {
