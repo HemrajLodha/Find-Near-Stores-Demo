@@ -23,6 +23,7 @@ import MapView, {AnimatedRegion, Marker, Polyline} from 'react-native-maps';
 import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
 import AsyncStorageKeys from "../../AsyncStorageKeys";
+import {PermissionUtils} from "../../utils/PermissionUtils";
 
 
 const ASPECT_RATIO = size.screen_width / size.screen_height;
@@ -71,9 +72,30 @@ class Locations extends Component {
         }
     };
 
+    checkForLocationPermission = () => {
+        PermissionUtils._checkLocationPermission().then(() => {
+            this.getCurrentLocation();
+        }).catch(err => {
+            PermissionUtils._requestLocationPermission().then(() => {
+                this.getCurrentLocation();
+            }).catch(err => {
+                this.requestLocationPermission();
+            });
+        });
+    };
 
-    async requestLocationPermission() {
-        try {
+
+    requestLocationPermission = () => {
+        if (Platform.OS === "android") {
+            if (Platform.Version > 22) {
+                this.checkForLocationPermission();
+            } else {
+                this.getCurrentLocation();
+            }
+        } else {
+            this.checkForLocationPermission();
+        }
+        /*try {
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                 {
@@ -89,7 +111,7 @@ class Locations extends Component {
             }
         } catch (err) {
             console.warn(err)
-        }
+        }*/
     }
 
     onRegionChange(region, lastLat, lastLong) {

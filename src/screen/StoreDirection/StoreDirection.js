@@ -21,6 +21,7 @@ import color from "../../../assets/values/color";
 import {Utils} from "../../utils/Utils";
 import AsyncStorageKeys from "../../AsyncStorageKeys";
 import * as Polyline from "@mapbox/polyline/src/polyline";
+import {PermissionUtils} from "../../utils/PermissionUtils";
 
 
 const ASPECT_RATIO = size.screen_width / size.screen_height;
@@ -100,6 +101,16 @@ class Locations extends Component {
     };
 
     requestLocationPermission() {
+       /* PermissionUtils._checkLocationPermission().then(() => {
+            this.getCurrentLocation();
+        }).catch(err => {
+            PermissionUtils._requestLocationPermission().then(() => {
+                this.getCurrentLocation();
+            }).catch(err => {
+                this.requestLocationPermission();
+            });
+        });*/
+
         try {
             PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,

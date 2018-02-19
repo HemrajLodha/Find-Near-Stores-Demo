@@ -4,7 +4,7 @@ import {actionToLogin} from "../../App";
 export async function apiRequest(config) {
     try {
         //config.headers.Authorization = 'Bearer ' + data.token.access_token;
-        console.log('apiRequest', config);
+        //console.log('apiRequest', config);
         return config;
     } catch (err) {
         return Promise.resolve(err);
@@ -18,7 +18,7 @@ export function requestError(error) {
 
 export function apiResponse(response) {
     try {
-        console.log('apiResponse', response.data);
+        //console.log('apiResponse', response.data);
         return Promise.resolve(response);
     } catch (err) {
         return Promise.reject(err);

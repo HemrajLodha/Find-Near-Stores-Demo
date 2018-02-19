@@ -9,7 +9,6 @@ export function getData() {
 }
 
 export function getDataSuccess(data) {
-    console.log("data", data);
     if (!data || data.length === 0) {
         return getDataFailure(false, "no data found");
     }
